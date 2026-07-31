@@ -1,71 +1,61 @@
-const GROUPS=[
-  {
-    id:'back',name:'גב',color:'#2f8cff',soft:'#eaf3ff',increment:5,
-    exercises:[
-      {id:'lat_pulldown',name:'Lat Pulldown',nameHe:'משיכה עליונה'},
-      {id:'seated_row',name:'Seated Row',nameHe:'חתירה בישיבה'},
-      {id:'dumbbell_row',name:'Dumbbell Row',nameHe:'חתירה עם דאמבל',weightLabel:'ק"ג לכל יד'}
-    ]
-  },
-  {
-    id:'chest',name:'חזה',color:'#21a66a',soft:'#eaf8f1',increment:2.5,
-    exercises:[
-      {id:'chest_press_machine',name:'Chest Press Machine',nameHe:'לחיצת חזה במכונה'},
-      {id:'dumbbell_chest_press',name:'Dumbbell Chest Press',nameHe:'לחיצת חזה עם דאמבלים',weightLabel:'ק"ג לכל יד'},
-      {id:'pec_deck',name:'Pec Deck',nameHe:'פרפר במכונה'}
-    ]
-  },
-  {
-    id:'shoulders',name:'כתפיים',color:'#8a48c7',soft:'#f3ebfb',increment:2.5,
-    exercises:[
-      {id:'shoulder_press_machine',name:'Shoulder Press Machine',nameHe:'לחיצת כתפיים במכונה'},
-      {id:'dumbbell_shoulder_press',name:'Dumbbell Shoulder Press',nameHe:'לחיצת כתפיים עם דאמבלים',weightLabel:'ק"ג לכל יד'},
-      {id:'kettlebell_shoulder_press',name:'Kettlebell Shoulder Press',nameHe:'לחיצת כתפיים עם קטלבל',weightLabel:'ק"ג לכל יד'}
-    ]
-  },
-  {
-    id:'quads',name:'ארבע ראשי',color:'#f0ad23',soft:'#fff6df',increment:5,
-    exercises:[
-      {id:'leg_press',name:'Leg Press',nameHe:'לחיצת רגליים'},
-      {id:'goblet_squat',name:'Goblet Squat',nameHe:'סקוואט גביע'},
-      {id:'leg_extension',name:'Leg Extension',nameHe:'פשיטת ברך במכונה'}
-    ]
-  },
-  {
-    id:'posterior',name:'ירך אחורית וישבן',color:'#18a9a0',soft:'#e7f8f7',increment:5,
-    exercises:[
-      {id:'leg_curl',name:'Leg Curl',nameHe:'כפיפת ברך במכונה'},
-      {id:'romanian_deadlift',name:'Romanian Deadlift',nameHe:'דדליפט רומני'},
-      {id:'hip_thrust',name:'Hip Thrust',nameHe:'הרמת אגן'}
-    ]
-  },
-  {
-    id:'biceps',name:'יד קדמית',color:'#df3f82',soft:'#fdebf3',increment:2.5,
-    exercises:[
-      {id:'dumbbell_curl',name:'Dumbbell Curl',nameHe:'כפיפת מרפק עם דאמבלים',weightLabel:'ק"ג לכל יד'}
-    ]
-  },
-  {
-    id:'triceps',name:'יד אחורית',color:'#e4664e',soft:'#fff0ed',increment:2.5,
-    exercises:[
-      {id:'tricep_pushdown',name:'Tricep Pushdown',nameHe:'פשיטת מרפק בכבל'}
-    ]
-  },
-  {
-    id:'core',name:'ליבה',color:'#4a154b',soft:'#f2e9f2',increment:0,
-    exercises:[
-      {id:'plank',name:'Plank',nameHe:'פלאנק',noWeight:true,repsLabel:'שניות'},
-      {id:'tabata_abs',name:'Tabata Abs',nameHe:'טאבטה בטן',noWeight:true,repsLabel:'סבבים'}
-    ]
-  }
-];
+// Muscle-group presentation metadata (Hebrew name, dashboard color, card
+// order). This is a UI concern, not domain data, so it stays static here
+// rather than in the database — see supabase/seed_exercises.sql.
+const MUSCLE_GROUPS={
+  back:      {name:'גב',                color:'#2f8cff',soft:'#eaf3ff',order:1},
+  chest:     {name:'חזה',                color:'#21a66a',soft:'#eaf8f1',order:2},
+  shoulders: {name:'כתפיים',             color:'#8a48c7',soft:'#f3ebfb',order:3},
+  quads:     {name:'ארבע ראשי',          color:'#f0ad23',soft:'#fff6df',order:4},
+  posterior: {name:'ירך אחורית וישבן',   color:'#18a9a0',soft:'#e7f8f7',order:5},
+  biceps:    {name:'יד קדמית',           color:'#df3f82',soft:'#fdebf3',order:6},
+  triceps:   {name:'יד אחורית',          color:'#e4664e',soft:'#fff0ed',order:7},
+  core:      {name:'ליבה',               color:'#4a154b',soft:'#f2e9f2',order:8}
+};
+
+// Populated by loadExercises() from gym.exercises before the app renders.
+let GROUPS=[];
+
+async function loadExercises(){
+  const {data,error}=await supabaseClient
+    .from('exercises')
+    .select('*')
+    .eq('is_active',true)
+    .order('display_order');
+  if(error)throw error;
+
+  const byGroup={};
+  data.forEach(row=>{
+    const meta=MUSCLE_GROUPS[row.muscle_group]||{name:row.muscle_group,color:'#4a154b',soft:'#f2e9f2',order:99};
+    if(!byGroup[row.muscle_group]){
+      byGroup[row.muscle_group]={
+        id:row.muscle_group,
+        name:meta.name,
+        color:meta.color,
+        soft:meta.soft,
+        order:meta.order,
+        exercises:[]
+      };
+    }
+    byGroup[row.muscle_group].exercises.push({
+      id:row.code,
+      dbId:row.id,
+      name:row.name,
+      nameHe:row.name_he,
+      weightLabel:row.weight_label||undefined,
+      repsLabel:row.reps_label||undefined,
+      noWeight:row.no_weight,
+      increment:Number(row.increment_kg)
+    });
+  });
+
+  GROUPS=Object.values(byGroup).sort((a,b)=>a.order-b.order);
+}
 
 function todayStr(){return new Date().toISOString().slice(0,10)}
 function fmtDate(v){
   if(!v)return '';
   const [y,m,d]=v.split('-');return `${d}/${m}/${y}`;
 }
-function slug(v){return String(v).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')}
 function groupById(id){return GROUPS.find(g=>g.id===id)}
 function exerciseById(id){
   for(const g of GROUPS){
@@ -73,12 +63,6 @@ function exerciseById(id){
     if(e)return {...e,group:g};
   }
   return null;
-}
-function normalizeLegacyExercise(ex){
-  if(ex.exerciseId)return ex;
-  const all=GROUPS.flatMap(g=>g.exercises.map(e=>({...e,group:g})));
-  const match=all.find(x=>x.name===ex.name);
-  return {...ex,exerciseId:match?.id||slug(ex.name||''),groupId:match?.group.id||ex.category||''};
 }
 
 function muscleSvg(groupId){
@@ -173,9 +157,9 @@ function getGoal(exerciseId){
 
   if(repeated){
     return {
-      weight:lastWeight+ex.group.increment,reps:8,
-      text:`היעד היום: העלה ל־${lastWeight+ex.group.increment} ${ex.weightLabel||'ק"ג'} וחזור ל־8 חזרות.`,
-      short:`יעד: ${lastWeight+ex.group.increment} ק"ג × 8`,
+      weight:lastWeight+ex.increment,reps:8,
+      text:`היעד היום: העלה ל־${lastWeight+ex.increment} ${ex.weightLabel||'ק"ג'} וחזור ל־8 חזרות.`,
+      short:`יעד: ${lastWeight+ex.increment} ק"ג × 8`,
       cls:'rec-good'
     };
   }
@@ -228,7 +212,7 @@ function currentRecommendation(ex,current){
   }
 
   if(samePrevious){
-    return {text:`בפעם הבאה העלה משקל ב־${ex.group.increment} ק"ג וחזור ל־8 חזרות.`,cls:'rec-good'};
+    return {text:`בפעם הבאה העלה משקל ב־${ex.increment} ק"ג וחזור ל־8 חזרות.`,cls:'rec-good'};
   }
   return {text:'הגעת ל־12 חזרות. חזור פעם נוספת לפני העלאת משקל.',cls:'rec-warn'};
 }

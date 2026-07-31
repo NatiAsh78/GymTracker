@@ -244,7 +244,7 @@ function renderExerciseArea(groupId){
 
 function renderHistory(){
   const panel=document.getElementById('panel-history');
-  const history=loadHistory().sort((a,b)=>new Date(b.date)-new Date(a.date)||(b.id||0)-(a.id||0));
+  const history=historyCache;
 
   const toolbar=`
     <div class="history-toolbar">
@@ -262,11 +262,10 @@ function renderHistory(){
   }
 
   panel.innerHTML=toolbar+history.map(session=>{
-    const exs=(session.exercises||[]).filter(e=>!e.isFlexibility);
+    const exs=session.exercises||[];
     const rpes=exs.map(e=>Number(e.rpe)).filter(v=>v>0);
     const avg=rpes.length?(rpes.reduce((a,b)=>a+b,0)/rpes.length).toFixed(1):'—';
-    const rows=exs.map(raw=>{
-      const ex=normalizeLegacyExercise(raw);
+    const rows=exs.map(ex=>{
       return `<tr>
         <td><strong>${ex.nameHe||ex.name||''}</strong><br><span style="color:var(--muted)">${ex.name||''}</span></td>
         <td>${ex.weight||'—'}</td>

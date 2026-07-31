@@ -50,7 +50,7 @@ function returnToDashboard(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function saveWorkout(){
+async function saveWorkout(){
   const completedGroups=GROUPS.filter(g=>workoutState[g.id]?.completed);
   if(!completedGroups.length){
     alert('עדיין לא הושלם אף תרגיל.');return;
@@ -61,27 +61,16 @@ function saveWorkout(){
     const ex=exerciseById(state.exerciseId);
     return {
       exerciseId:ex.id,
-      groupId:group.id,
-      name:ex.name,
-      nameHe:ex.nameHe,
-      muscle:group.name,
-      category:group.id,
       weight:ex.noWeight?0:Number(state.weight),
       reps:Number(state.reps),
       rpe:Number(state.rpe),
-      repsLabel:ex.repsLabel||'חזרות',
-      recommendation:state.recommendation||'',
-      completed:true,
-      isCore:group.id==='core',
-      isFlexibility:false
+      recommendation:state.recommendation||''
     };
   });
 
   const ratingBtn=document.querySelector('.rating-dot.selected');
   const session={
-    id:Date.now(),
     date:document.getElementById('sessionDate').value||todayStr(),
-    workoutType:'FullBody',
     bodyWeight:Number(document.getElementById('bodyWeight').value)||null,
     bodyFat:Number(document.getElementById('bodyFat').value)||null,
     note:document.getElementById('sessionNote').value.trim(),
@@ -89,9 +78,16 @@ function saveWorkout(){
     exercises
   };
 
-  const history=loadHistory();
-  history.push(session);
-  saveHistory(history);
+  const saveBtn=document.getElementById('saveWorkoutBtn');
+  saveBtn.disabled=true;
+  try{
+    await saveSession(session);
+  }catch(err){
+    console.error('saveWorkout failed:',err);
+    alert('שמירת האימון נכשלה. בדוק את החיבור לאינטרנט ונסה שוב.');
+    saveBtn.disabled=false;
+    return;
+  }
 
   const msg=document.getElementById('saveMessage');
   msg.classList.add('show');

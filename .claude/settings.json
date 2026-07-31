@@ -25,7 +25,19 @@
       "Bash(powershell -NoProfile -Command 'Get-NetTCPConnection -LocalPort 5500 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')",
       "Bash(xxd)",
       "Bash(node screenshot2.js)",
-      "Bash(powershell -NoProfile -Command 'Get-NetTCPConnection -LocalPort 5500 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')"
+      "Bash(powershell -NoProfile -Command 'Get-NetTCPConnection -LocalPort 5500 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')",
+      "Bash(supabase --version)",
+      "Bash(node check-supabase.js)",
+      "Bash(powershell -NoProfile -Command \"New-Item -ItemType Directory -Force -Path 'd:\\\\Dropbox Files Nati\\\\Dropbox\\\\Projects\\\\GymTracker\\\\supabase' | Out-Null\")",
+      "Bash(node check-supabase2.js)",
+      "Read(//d/Dropbox Files Nati/Dropbox/**)",
+      "Bash(node import-legacy-history.js)",
+      "Read(//c/Users/asher/Downloads/**)",
+      "Bash(node import-full-history.js)",
+      "Bash(node verify-import.js)",
+      "Bash(node test-supabase-app.js)",
+      "Bash(node test-save-flow.js)",
+      "Bash(node cleanup-test-session.js)"
     ]
   }
 }
