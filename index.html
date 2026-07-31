@@ -20,7 +20,10 @@
       <div class="brand">מעקב אימון כוח</div>
       <div class="brand-sub">אימון גוף מלא · היעד של היום בכל תרגיל</div>
     </div>
-    <div class="header-date" id="headerDate"></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="header-date" id="headerDate"></div>
+      <button class="btn btn-secondary hidden" id="logoutBtn" style="min-height:36px;padding:8px 14px">התנתק</button>
+    </div>
   </div>
 </header>
 
@@ -30,6 +33,7 @@
 </nav>
 
 <main>
+  <section id="panel-login" class="panel"></section>
   <section id="panel-workout" class="panel active"></section>
   <section id="panel-history" class="panel"></section>
 </main>
@@ -37,6 +41,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/data.js"></script>
 <script src="js/history.js"></script>
 <script src="js/workout.js"></script>

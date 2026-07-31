@@ -1,3 +1,51 @@
+function renderLoginForm(onSubmit){
+  document.querySelector('nav').classList.add('hidden');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const panel=document.getElementById('panel-login');
+  panel.classList.add('active');
+  panel.innerHTML=`
+    <div class="top-card" style="max-width:360px;margin:60px auto 0">
+      <div class="section-title" style="margin-top:0">התחברות</div>
+      <div class="field">
+        <label>אימייל</label>
+        <input id="loginEmail" type="email" autocomplete="username">
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label>סיסמה</label>
+        <input id="loginPassword" type="password" autocomplete="current-password">
+      </div>
+      <div class="live-rec rec-danger hidden" id="loginError" style="margin-top:14px"></div>
+      <button class="btn btn-primary" id="loginSubmitBtn" style="width:100%;margin-top:16px">התחבר</button>
+    </div>
+  `;
+
+  const submit=async()=>{
+    const email=document.getElementById('loginEmail').value.trim();
+    const password=document.getElementById('loginPassword').value;
+    const errBox=document.getElementById('loginError');
+    const btn=document.getElementById('loginSubmitBtn');
+    errBox.classList.add('hidden');
+    btn.disabled=true;
+    try{
+      await onSubmit(email,password);
+    }catch(err){
+      console.error('login failed:',err);
+      errBox.textContent='התחברות נכשלה. בדוק אימייל וסיסמה.';
+      errBox.classList.remove('hidden');
+      btn.disabled=false;
+    }
+  };
+  document.getElementById('loginSubmitBtn').addEventListener('click',submit);
+  document.getElementById('loginPassword').addEventListener('keydown',e=>{
+    if(e.key==='Enter')submit();
+  });
+}
+
+function showApp(){
+  document.querySelector('nav').classList.remove('hidden');
+  document.getElementById('logoutBtn')?.classList.remove('hidden');
+}
+
 function renderWorkout(){
   const panel=document.getElementById('panel-workout');
   panel.innerHTML=`

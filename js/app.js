@@ -9,11 +9,13 @@ document.querySelectorAll('.tab').forEach(tab=>{
   });
 });
 
-async function init(){
-  const now=new Date();
-  document.getElementById('headerDate').textContent=
-    `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+document.getElementById('logoutBtn')?.addEventListener('click',async()=>{
+  await signOut();
+  location.reload();
+});
 
+async function bootApp(){
+  showApp();
   const panel=document.getElementById('panel-workout');
   panel.innerHTML='<div class="empty">טוען נתונים מהענן…</div>';
 
@@ -26,7 +28,32 @@ async function init(){
     return;
   }
 
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-workout').classList.add('active');
   renderWorkout();
+}
+
+async function init(){
+  const now=new Date();
+  document.getElementById('headerDate').textContent=
+    `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+
+  let session=null;
+  try{
+    session=await getSession();
+  }catch(err){
+    console.error('Failed to check session:',err);
+  }
+
+  if(!session){
+    renderLoginForm(async(email,password)=>{
+      await signIn(email,password);
+      await bootApp();
+    });
+    return;
+  }
+
+  await bootApp();
 }
 
 init();

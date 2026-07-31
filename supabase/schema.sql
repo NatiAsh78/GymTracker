@@ -7,11 +7,11 @@
 -- the app needs that were missing, and sets up access (grants + RLS).
 -- Safe to re-run.
 --
--- IMPORTANT: RLS policies below are intentionally OPEN (allow the public
--- "anon" key to read and write) because the app has no authentication yet.
--- This is acceptable ONLY while the app runs locally / privately. Before
--- hosting this app publicly (e.g. so it's reachable from a phone), add
--- Supabase Auth and replace these policies with ones scoped to auth.uid().
+-- Access requires a signed-in Supabase Auth user (see js/auth.js). There is
+-- no self-serve signup in the app — create your account once via
+-- Authentication -> Users -> Add user in the Supabase dashboard. This is a
+-- single-user app for now; every authenticated user gets full access
+-- (no per-user ownership) — see CLAUDE.md's "Multiple users (future)".
 
 -- ---------------------------------------------------------------------
 -- Missing columns the app needs
@@ -33,40 +33,50 @@ end $$;
 -- ---------------------------------------------------------------------
 -- Access grants — a custom schema (anything other than "public") is not
 -- reachable by the anon/authenticated roles by default, even once it's
--- exposed in Data API settings. This grants the same access level the
--- open RLS policies below describe.
+-- exposed in Data API settings. Only "authenticated" gets table access;
+-- "anon" (unauthenticated) is granted nothing, so a request without a
+-- valid login session is rejected before RLS is even evaluated.
 -- ---------------------------------------------------------------------
-grant usage on schema gym to anon, authenticated;
-grant select, insert, update, delete on gym.exercises, gym.workout_sessions, gym.exercise_logs to anon, authenticated;
+revoke all on gym.exercises, gym.workout_sessions, gym.exercise_logs from anon;
+revoke usage on schema gym from anon;
+
+grant usage on schema gym to authenticated;
+grant select, insert, update, delete on gym.exercises, gym.workout_sessions, gym.exercise_logs to authenticated;
 
 -- ---------------------------------------------------------------------
--- Row Level Security — OPEN for now (no auth in the app yet). See warning
--- at the top of this file before hosting the app publicly.
+-- Row Level Security — requires a signed-in user (auth.uid() is not null).
 -- ---------------------------------------------------------------------
 alter table gym.exercises enable row level security;
 alter table gym.workout_sessions enable row level security;
 alter table gym.exercise_logs enable row level security;
 
 drop policy if exists "public read exercises" on gym.exercises;
-create policy "public read exercises" on gym.exercises
-  for select using (true);
+drop policy if exists "authenticated read exercises" on gym.exercises;
+create policy "authenticated read exercises" on gym.exercises
+  for select using (auth.uid() is not null);
 
 drop policy if exists "public read workout_sessions" on gym.workout_sessions;
-create policy "public read workout_sessions" on gym.workout_sessions
-  for select using (true);
+drop policy if exists "authenticated read workout_sessions" on gym.workout_sessions;
+create policy "authenticated read workout_sessions" on gym.workout_sessions
+  for select using (auth.uid() is not null);
 drop policy if exists "public write workout_sessions" on gym.workout_sessions;
-create policy "public write workout_sessions" on gym.workout_sessions
-  for insert with check (true);
+drop policy if exists "authenticated write workout_sessions" on gym.workout_sessions;
+create policy "authenticated write workout_sessions" on gym.workout_sessions
+  for insert with check (auth.uid() is not null);
 drop policy if exists "public delete workout_sessions" on gym.workout_sessions;
-create policy "public delete workout_sessions" on gym.workout_sessions
-  for delete using (true);
+drop policy if exists "authenticated delete workout_sessions" on gym.workout_sessions;
+create policy "authenticated delete workout_sessions" on gym.workout_sessions
+  for delete using (auth.uid() is not null);
 
 drop policy if exists "public read exercise_logs" on gym.exercise_logs;
-create policy "public read exercise_logs" on gym.exercise_logs
-  for select using (true);
+drop policy if exists "authenticated read exercise_logs" on gym.exercise_logs;
+create policy "authenticated read exercise_logs" on gym.exercise_logs
+  for select using (auth.uid() is not null);
 drop policy if exists "public write exercise_logs" on gym.exercise_logs;
-create policy "public write exercise_logs" on gym.exercise_logs
-  for insert with check (true);
+drop policy if exists "authenticated write exercise_logs" on gym.exercise_logs;
+create policy "authenticated write exercise_logs" on gym.exercise_logs
+  for insert with check (auth.uid() is not null);
 drop policy if exists "public delete exercise_logs" on gym.exercise_logs;
-create policy "public delete exercise_logs" on gym.exercise_logs
-  for delete using (true);
+drop policy if exists "authenticated delete exercise_logs" on gym.exercise_logs;
+create policy "authenticated delete exercise_logs" on gym.exercise_logs
+  for delete using (auth.uid() is not null);

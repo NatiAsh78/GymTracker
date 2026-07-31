@@ -37,7 +37,8 @@
       "Bash(node verify-import.js)",
       "Bash(node test-supabase-app.js)",
       "Bash(node test-save-flow.js)",
-      "Bash(node cleanup-test-session.js)"
+      "Bash(node cleanup-test-session.js)",
+      "Bash(node test-login-gate.js)"
     ]
   }
 }
