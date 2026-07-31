@@ -22,7 +22,10 @@
       "Bash(npm init *)",
       "Bash(npm install *)",
       "Bash(node screenshot.js)",
-      "Bash(powershell -NoProfile -Command 'Get-NetTCPConnection -LocalPort 5500 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')"
+      "Bash(powershell -NoProfile -Command 'Get-NetTCPConnection -LocalPort 5500 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')",
+      "Bash(xxd)",
+      "Bash(node screenshot2.js)",
+      "Bash(powershell -NoProfile -Command 'Get-NetTCPConnection -LocalPort 5500 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')"
     ]
   }
 }
