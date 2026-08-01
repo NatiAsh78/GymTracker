@@ -38,7 +38,11 @@
       "Bash(node test-supabase-app.js)",
       "Bash(node test-save-flow.js)",
       "Bash(node cleanup-test-session.js)",
-      "Bash(node test-login-gate.js)"
+      "Bash(node test-login-gate.js)",
+      "Bash(curl -sI https://natiash78.github.io/GymTracker/)",
+      "Bash(node test-live-site.js)",
+      "Bash(powershell -NoProfile -Command \"New-Item -ItemType Directory -Force -Path 'd:\\\\Dropbox Files Nati\\\\Dropbox\\\\Projects\\\\GymTracker\\\\assets\\\\icons' | Out-Null\")",
+      "Bash(node gen-icon.js)"
     ]
   }
 }
