@@ -1,19 +1,20 @@
 *{box-sizing:border-box}
 :root{
-  --bg:#f6f1f7;
+  --bg:#f7f5ee;
   --card:#ffffff;
-  --text:#2b2030;
-  --muted:#786f7c;
-  --line:#e7dfe9;
-  --primary:#4a154b;
-  --primary-soft:#f1e7f2;
+  --text:#26382e;
+  --muted:#697466;
+  --line:#dfe4d8;
+  --primary:#244c3c;
+  --primary-soft:#e7eee4;
+  --accent:#789578;
   --green:#18864f;
   --green-soft:#eaf7ef;
   --amber:#9a6900;
   --amber-soft:#fff6df;
   --red:#b43348;
   --red-soft:#fff0f3;
-  --shadow:0 12px 30px rgba(74,21,75,.08);
+  --shadow:0 12px 30px rgba(36,76,60,.08);
 }
 html,body{margin:0;min-height:100%}
 body{
@@ -30,7 +31,7 @@ header{
   background:var(--primary);
   color:white;
   padding:16px;
-  box-shadow:0 5px 18px rgba(74,21,75,.2);
+  box-shadow:0 5px 18px rgba(36,76,60,.2);
 }
 .header-inner{
   max-width:900px;margin:auto;
@@ -75,12 +76,12 @@ main{max-width:900px;margin:auto;padding:16px 14px 50px}
   background:white;color:var(--text);
 }
 .field input:focus,.field textarea:focus,.exercise-select:focus,.number-input:focus{
-  outline:3px solid rgba(74,21,75,.11);
+  outline:3px solid rgba(36,76,60,.11);
   border-color:var(--primary);
 }
 
 .progress-card{
-  background:linear-gradient(135deg,#fff,#f7eff8);
+  background:linear-gradient(135deg,#fff,#eff2e8);
   border:1px solid var(--line);
   border-radius:20px;padding:15px 16px;margin-bottom:18px;
   display:flex;justify-content:space-between;align-items:center;gap:16px;
@@ -88,10 +89,10 @@ main{max-width:900px;margin:auto;padding:16px 14px 50px}
 .progress-title{font-size:14px;color:var(--muted);font-weight:700}
 .progress-value{font-size:27px;font-weight:800;color:var(--primary)}
 .progress-bar{
-  flex:1;height:12px;border-radius:999px;background:#e9dfea;overflow:hidden;
+  flex:1;height:12px;border-radius:999px;background:#dee6d8;overflow:hidden;
 }
 .progress-fill{
-  width:0;height:100%;background:var(--primary);transition:.25s;
+  width:0;height:100%;background:var(--accent);transition:.25s;
 }
 
 .section-title{font-size:23px;font-weight:800;margin:22px 2px 4px}
@@ -101,7 +102,7 @@ main{max-width:900px;margin:auto;padding:16px 14px 50px}
   display:grid;grid-template-columns:repeat(2,1fr);gap:14px;
 }
 .group-card{
-  --group:#4a154b;--soft:#f1e7f2;
+  --group:#244c3c;--soft:#e7eee4;
   border:1px solid var(--line);
   border-left:9px solid var(--group);
   background:white;
@@ -112,8 +113,8 @@ main{max-width:900px;margin:auto;padding:16px 14px 50px}
   transition:transform .15s,box-shadow .15s;
   position:relative;
 }
-.group-card:hover{transform:translateY(-1px);box-shadow:0 15px 35px rgba(74,21,75,.11)}
-.group-card.completed{background:linear-gradient(135deg,#fff,#f4fbf7)}
+.group-card:hover{transform:translateY(-1px);box-shadow:0 15px 35px rgba(36,76,60,.11)}
+.group-card.completed{background:linear-gradient(135deg,#fff,#f0f5ed)}
 .group-card.in-progress{background:linear-gradient(135deg,#fff,#fff9eb)}
 .group-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .group-id{display:flex;align-items:center;gap:12px;min-width:0}
@@ -129,7 +130,7 @@ main{max-width:900px;margin:auto;padding:16px 14px 50px}
 .status-badge{
   width:32px;height:32px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  border:2px solid #d8ceda;color:#a89fab;
+  border:2px solid #cdd7c8;color:#8d9a87;
   font-weight:900;flex-shrink:0;
 }
 .group-card.completed .status-badge{
@@ -156,7 +157,7 @@ main{max-width:900px;margin:auto;padding:16px 14px 50px}
   font-weight:800;padding:5px 0 12px;cursor:pointer;font-size:16px;
 }
 .detail-card{
-  --group:#4a154b;--soft:#f1e7f2;
+  --group:#244c3c;--soft:#e7eee4;
   background:white;border:1px solid var(--line);
   border-top:8px solid var(--group);
   border-radius:24px;box-shadow:var(--shadow);
@@ -181,7 +182,7 @@ main{max-width:900px;margin:auto;padding:16px 14px 50px}
   border-radius:18px;padding:14px;
   border:1px solid var(--line);
 }
-.previous-box{background:#fbf9fc}
+.previous-box{background:#fafaf4}
 .goal-box{background:var(--soft);border-color:color-mix(in srgb,var(--group) 25%,white)}
 .info-title{
   font-size:13px;font-weight:800;color:var(--muted);margin-bottom:6px;
@@ -207,7 +208,7 @@ main{max-width:900px;margin:auto;padding:16px 14px 50px}
   margin-top:15px;padding:14px;border-radius:17px;
   border:1px solid var(--line);font-weight:800;
 }
-.rec-neutral{background:#faf8fb;color:var(--muted)}
+.rec-neutral{background:#f5f6ef;color:var(--muted)}
 .rec-good{background:var(--green-soft);color:var(--green);border-color:#cbead7}
 .rec-warn{background:var(--amber-soft);color:var(--amber);border-color:#efd99d}
 .rec-danger{background:var(--red-soft);color:var(--red);border-color:#efc8d0}
@@ -284,3 +285,39 @@ main{max-width:900px;margin:auto;padding:16px 14px 50px}
   .finish-grid .full{grid-column:auto}
   .history-table{display:block;overflow-x:auto;white-space:nowrap}
 }
+
+/* Fixed prescriptions and per-exercise RIR entry. */
+h1,h2{margin:0 0 8px;line-height:1.25}
+h1{font-size:28px}h2{font-size:21px}
+.app-notice{max-width:872px;margin:14px auto;padding:12px 16px;border-radius:14px;white-space:pre-line}
+.workout-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+.plan-choice{border:2px solid var(--line);background:var(--card);border-radius:20px;padding:24px 16px;cursor:pointer;color:var(--text)}
+.plan-choice.suggested{border-color:var(--primary);background:var(--primary-soft)}
+.plan-choice strong{display:block;font-size:48px;color:var(--primary)}
+.plan-choice span,.plan-choice small{display:block;margin-top:8px}
+.plan-choice small{color:var(--muted)}
+.exercise-list{display:grid;gap:18px}
+.exercise-card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow)}
+.exercise-card.completed{border-color:var(--green);border-inline-start:5px solid var(--green)}
+.exercise-card.skipped{border-style:dashed;background:#f5f6ef}
+.exercise-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.exercise-group{color:var(--primary);font-size:13px;font-weight:700}
+.exercise-english{color:var(--muted);font-size:13px;text-align:right}
+.prescription{background:var(--primary-soft);color:var(--primary);padding:8px 12px;border-radius:12px;white-space:nowrap;font-size:14px;font-weight:700}
+.exercise-card .entry-grid{margin-top:20px}
+.goal-box{background:var(--primary-soft)}
+.warmup-note{background:var(--amber-soft);padding:10px 12px;border-radius:12px;font-size:14px}
+.field select{width:100%;min-height:48px;border:1px solid var(--line);border-radius:14px;padding:10px;background:white}
+.login-card{max-width:380px;margin:40px auto}.login-card .field{margin-top:14px}.login-card button{width:100%;margin-top:20px}
+button:disabled{opacity:.6;cursor:wait}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--primary);outline-offset:3px}
+.history-content{padding:16px;border-top:1px solid var(--line)}
+.history-head strong{margin-inline-start:12px}.history-note{white-space:pre-wrap}
+.history-table{display:block;overflow-x:auto}
+@media(max-width:680px){
+  .choice-grid{grid-template-columns:1fr}.exercise-card{padding:14px}.workout-heading{align-items:flex-start}
+  .exercise-card-head{flex-wrap:wrap}.entry-field label{min-height:38px}.app-notice{margin:10px 11px}
+  .detail-actions .btn{flex:1;min-width:130px}.header-inner{gap:8px}.header-date{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}

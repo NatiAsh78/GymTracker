@@ -13,8 +13,13 @@ function transformSession(row){
     bodyFat:row.body_fat,
     note:row.notes||'',
     rating:row.rating,
+    programVersion:row.program_version||null,
+    workoutType:row.workout_type||null,
+    clientRequestId:row.client_request_id||null,
+    createdAt:row.created_at||'',
+    skippedCodes:row.skipped_codes||[],
     exercises:(row.exercise_logs||[]).map(log=>{
-      const ex=log.exercises;
+      const ex=log.exercises||{};
       const meta=MUSCLE_GROUPS[ex.muscle_group];
       return {
         exerciseId:ex.code,
@@ -25,6 +30,12 @@ function transformSession(row){
         weight:log.weight,
         reps:log.reps,
         rpe:log.rpe,
+        rir:log.rir===null||log.rir===undefined?null:Number(log.rir),
+        sets:log.prescribed_sets,
+        minReps:log.rep_min,
+        maxReps:log.rep_max,
+        unilateral:log.unilateral||false,
+        weightLabel:ex.weight_label||'ק״ג',
         repsLabel:ex.reps_label||'חזרות',
         recommendation:log.recommendation||''
       };
@@ -59,6 +70,7 @@ function getExerciseHistory(exerciseId){
 
 // session: {date, bodyWeight, bodyFat, note, rating, exercises:[{exerciseId, weight, reps, rpe, recommendation}]}
 async function saveSession(session){
+  if(session.programVersion===PROGRAM_VERSION)return savePlanSession(session);
   const {data:sessionRow,error:sessErr}=await supabaseClient
     .from('workout_sessions')
     .insert({
@@ -117,6 +129,13 @@ function exportJSON(){
   a.href=url;a.download=`gym-history-${todayStr()}.json`;a.click();URL.revokeObjectURL(url);
 }
 
+function sessionFingerprint(session){
+  return JSON.stringify({date:session.date,version:session.programVersion||null,type:session.workoutType||null,
+    bodyWeight:session.bodyWeight??null,bodyFat:session.bodyFat??null,note:session.note||'',rating:session.rating??null,
+    skipped:(session.skippedCodes||[]).slice().sort(),
+    exercises:(session.exercises||[]).map(e=>[e.exerciseId,Number(e.weight??0),Number(e.reps),Number(e.rpe??0),e.rir??null]).sort((a,b)=>a[0].localeCompare(b[0]))});
+}
+
 async function importJSON(){
   const input=document.createElement('input');
   input.type='file';input.accept='.json,application/json';
@@ -127,10 +146,11 @@ async function importJSON(){
       try{
         const incoming=JSON.parse(ev.target.result);
         if(!Array.isArray(incoming))throw new Error();
-        const existingKeys=new Set(historyCache.map(s=>`${s.date}|${s.exercises.length}`));
+        if(incoming.some(s=>!s || !validDate(s.date) || !Array.isArray(s.exercises)))throw new Error('Invalid session structure');
+        const existingKeys=new Set(historyCache.map(sessionFingerprint));
         let imported=0;
         for(const session of incoming){
-          const key=`${session.date}|${(session.exercises||[]).length}`;
+          const key=sessionFingerprint(session);
           if(existingKeys.has(key))continue;
           const exercises=(session.exercises||[])
             .filter(ex=>ex.exerciseId&&exerciseById(ex.exerciseId))
@@ -139,18 +159,28 @@ async function importJSON(){
               weight:ex.weight??0,
               reps:ex.reps,
               rpe:ex.rpe??0,
+              rir:ex.rir??null,
               recommendation:ex.recommendation||''
             }));
           if(!exercises.length)continue;
+          if(exercises.length!==session.exercises.length)throw new Error('Unknown exercise; refusing partial import');
+          if(session.programVersion===PROGRAM_VERSION){
+            if(!['A','B'].includes(session.workoutType) || exercises.some(e=>!planExercise(e.exerciseId)||planExercise(e.exerciseId).type!==session.workoutType||entryError(planExercise(e.exerciseId),e)))throw new Error('Invalid A/B workout');
+          }
           await saveSession({
             date:session.date,
             bodyWeight:session.bodyWeight??null,
             bodyFat:session.bodyFat??null,
             note:session.note||'',
             rating:session.rating??null,
+            programVersion:session.programVersion||null,
+            workoutType:session.workoutType||null,
+            clientRequestId:session.clientRequestId||crypto.randomUUID(),
+            skippedCodes:session.skippedCodes||[],
             exercises
           });
           imported++;
+          existingKeys.add(key);
         }
         alert(`נוספו ${imported} אימונים חדשים.`);
         renderHistory();
@@ -179,6 +209,12 @@ function exportExcel(){
         'חזרות/זמן':ex.reps??'',
         'יחידה':ex.repsLabel||'',
         'RPE':ex.rpe??'',
+        'RIR':ex.rir??'',
+        'אימון':session.workoutType||'גוף מלא',
+        'תוכנית':session.programVersion||'קודמת',
+        'סטים':ex.sets??'',
+        'לכל צד':ex.unilateral?'כן':'',
+        'יחידת משקל':ex.weightLabel||'ק״ג',
         'המלצה':ex.recommendation||'',
         'משקל גוף':session.bodyWeight??'',
         'שומן גוף':session.bodyFat??'',
@@ -189,7 +225,7 @@ function exportExcel(){
   });
   if(typeof XLSX!=='undefined'){
     const ws=XLSX.utils.json_to_sheet(rows);
-    ws['!cols']=[{wch:12},{wch:18},{wch:25},{wch:24},{wch:10},{wch:12},{wch:10},{wch:7},{wch:45},{wch:12},{wch:12},{wch:12},{wch:30}];
+    ws['!cols']=Object.keys(rows[0]).map(key=>({wch:key==='המלצה'||key==='הערה'?45:key==='תרגיל'||key==='שם עברית'?28:16}));
     const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'אימונים');
     XLSX.writeFile(wb,`gym-history-${todayStr()}.xlsx`);
   }else{

@@ -51,7 +51,7 @@ async function loadExercises(){
   GROUPS=Object.values(byGroup).sort((a,b)=>a.order-b.order);
 }
 
-function todayStr(){return new Date().toISOString().slice(0,10)}
+function todayStr(){return localToday()}
 function fmtDate(v){
   if(!v)return '';
   const [y,m,d]=v.split('-');return `${d}/${m}/${y}`;
